@@ -3,6 +3,7 @@ import Skeleton from "react-loading-skeleton";
 import { NavLink } from "react-router-dom";
 
 const Products = () => {
+  const [btnLabel, setBtnLabel] = useState("All");
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState(data);
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ const Products = () => {
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
-      const response = await fetch(`http://fakestoreapi.com/products`);
+      const response = await fetch("http://fakestoreapi.com/products");
       if (componentMounted) {
         setData(await response.clone().json());
         setFilter(await response.json());
@@ -28,6 +29,7 @@ const Products = () => {
 
   const Loading = () => {
     return (
+      // <div style={{ height: "100vh" }}>
       <>
         <div className="col-md-3">
           <Skeleton height={350} />
@@ -51,67 +53,72 @@ const Products = () => {
   };
 
   const ShowProducts = () => {
+    const btnArr = [
+      { id: 1, label: "All", handleClick: () => setFilter(data) },
+      {
+        id: 2,
+        label: "Men's Clothing",
+        handleClick: () => filterProduct("men's clothing"),
+      },
+      {
+        id: 3,
+        label: "Women's Clothing",
+        handleClick: () => filterProduct("women's clothing"),
+      },
+      {
+        id: 4,
+        label: "Jewelery",
+        handleClick: () => filterProduct("jewelery"),
+      },
+      {
+        id: 5,
+        label: "Electronics",
+        handleClick: () => filterProduct("electronics"),
+      },
+    ];
     return (
       <>
         <div className="buttons d-flex justify-content-center mb-5 pb-5">
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => setFilter(data)}
-          >
-            All
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProduct("men's clothing")}
-          >
-            Men's Clothing
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProduct("women's clothing")}
-          >
-            Women's Clothing
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProduct("jewelry")}
-          >
-            Jewelry
-          </button>
-          <button
-            className="btn btn-outline-dark me-2"
-            onClick={() => filterProduct("electronic")}
-          >
-            Electronic
-          </button>
+          {btnArr.map((btn) => (
+            <button
+              key={btn.id}
+              className={`btn btn-outline-dark me-2 ${
+                btnLabel === btn.label ? "bg-dark text-white" : ""
+              }`}
+              onClick={() => {
+                setBtnLabel(btn.label);
+                btn.handleClick();
+              }}
+            >
+              {btn.label}
+            </button>
+          ))}
         </div>
         {filter.map((product) => {
           return (
-            <>
-              <div className="col-md-3 mb-4">
-                <div className="card h-100 text-center p-4 key={product.id}">
-                  <img
-                    src={product.image}
-                    className="card-img-top"
-                    alt={product.title}
-                    height="250px"
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title mb-0">
-                      {product.title.substring(0, 12)}...
-                    </h5>
-                    <h6 className="card-subtitle mb-2 text-muted"></h6>
-                    <p className="card-text lead fw-bold">${product.price}</p>
-                    <NavLink
-                      to={`/products/${product.id}`}
-                      className="btn btn-outline-dark"
-                    >
-                      Buy Now
-                    </NavLink>
-                  </div>
+            <div key={product.id} className="col-md-3 mb-4">
+              <div className="card h-100 text-center p-4 key={product.id}">
+                <img
+                  src={product.image}
+                  className="card-img-top"
+                  alt={product.title}
+                  height="250px"
+                />
+                <div className="card-body">
+                  <h5 className="card-title mb-0">
+                    {product.title.substring(0, 12)}...
+                  </h5>
+                  <h6 className="card-subtitle mb-2 text-muted"></h6>
+                  <p className="card-text lead fw-bold">${product.price}</p>
+                  <NavLink
+                    to={`/product/${product.id}`}
+                    className="btn btn-outline-dark"
+                  >
+                    Buy Now
+                  </NavLink>
                 </div>
               </div>
-            </>
+            </div>
           );
         })}
       </>
